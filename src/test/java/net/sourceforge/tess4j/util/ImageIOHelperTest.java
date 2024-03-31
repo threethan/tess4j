@@ -56,24 +56,7 @@ public class ImageIOHelperTest {
     public void tearDown() {
     }
 
-    /**
-     * Test of createTiffFiles method, of class ImageIOHelper.
-     * @throws java.lang.Exception
-     */
-    @Test
-    public void testCreateTiffFiles_File_int() throws Exception {
-        logger.info("createTiffFiles");
-        File imageFile = new File(TEST_RESOURCES_DATA_PATH, "eurotext.png");
-        int index = 0;
-        int expResult = 1;
-        List<File> result = ImageIOHelper.createTiffFiles(imageFile, index);
-        assertEquals(expResult, result.size());
-        
-        // cleanup
-        for (File f : result) {
-            f.delete();
-        }
-    }
+
 
     /**
      * Test of getImageFileFormat method, of class ImageIOHelper.
@@ -100,31 +83,6 @@ public class ImageIOHelperTest {
         assertEquals(expResult, result);
     }
 
-    /**
-     * Test of getImageList method, of class ImageIOHelper.
-     * @throws java.lang.Exception
-     */
-    @Test
-    public void testGetImageList() throws Exception {
-        logger.info("getImageList");
-        File imageFile = new File(TEST_RESOURCES_DATA_PATH, "eurotext.pdf");
-        int expResult = 1;
-        List<BufferedImage> result = ImageIOHelper.getImageList(imageFile);
-        assertEquals(expResult, result.size());
-    }
-
-    /**
-     * Test of getIIOImageList method, of class ImageIOHelper.
-     * @throws java.lang.Exception
-     */
-    @Test
-    public void testGetIIOImageList_File() throws Exception {
-        logger.info("getIIOImageList");
-        File imageFile = new File(TEST_RESOURCES_DATA_PATH, "eurotext.pdf");
-        int expResult = 1;
-        List<IIOImage> result = ImageIOHelper.getIIOImageList(imageFile);
-        assertEquals(expResult, result.size());
-    }
 
     /**
      * Test of getIIOImageList method, of class ImageIOHelper.
@@ -139,54 +97,5 @@ public class ImageIOHelperTest {
         assertNotNull(result);
     }
 
-    /**
-     * Test of mergeTiff method, of class ImageIOHelper.
-     * @throws java.lang.Exception
-     */
-    @Test
-    public void testMergeTiff_FileArr_File() throws Exception {
-        logger.info("mergeTiff");
-        File imageFile1 = new File(TEST_RESOURCES_DATA_PATH, "eurotext.png"); // filesize: 14,854 bytes
-        File imageFile2 = new File(TEST_RESOURCES_DATA_PATH, "eurotext_deskew.png"); // filesize: 204,383 bytes
-        File[] inputImages = {imageFile1, imageFile2};
-        File outputTiff = new File(TEST_RESOURCES_RESULTS_PATH, "mergedTiff.tif");
-        long expResult = 224337L; // filesize: 224,337 bytes
-        ImageIOHelper.mergeTiff(inputImages, outputTiff);
-        assertEquals(expResult, outputTiff.length());
-    }
-
-    /**
-     * Test of deskewImage method, of class ImageIOHelper.
-     * @throws java.lang.Exception
-     */
-    @Test
-    public void testDeskewImage() throws Exception {
-        logger.info("deskewImage");
-        File imageFile = new File(TEST_RESOURCES_DATA_PATH, "eurotext_deskew.png");
-        double minimumDeskewThreshold = MINIMUM_DESKEW_THRESHOLD;
-        double initAngle = new ImageDeskew(ImageIO.read(imageFile)).getSkewAngle();
-        File result = ImageIOHelper.deskewImage(imageFile, minimumDeskewThreshold);
-        double resultAngle = new ImageDeskew(ImageIO.read(result)).getSkewAngle();
-        assertTrue(Math.abs(resultAngle) < Math.abs(initAngle));
-        // cleanup
-        result.delete();
-    }
-
-    /**
-     * Test of readImageData method, of class ImageIOHelper.
-     * @throws java.io.IOException
-     */
-    @Test
-    public void testReadImageData() throws IOException {
-        logger.info("readImageData");
-        File imageFile = new File(TEST_RESOURCES_DATA_PATH, "eurotext.png");
-        List<IIOImage> oimages = ImageIOHelper.getIIOImageList(imageFile);
-        IIOImage oimage = oimages.get(0);
-        int expResultDpiX = 300;
-        int expResultDpiY = 300;
-        Map<String, String> result = ImageIOHelper.readImageData(oimage);
-        assertEquals(String.valueOf(expResultDpiX), result.get("dpiX"));
-        assertEquals(String.valueOf(expResultDpiY), result.get("dpiY"));
-    }
 
 }

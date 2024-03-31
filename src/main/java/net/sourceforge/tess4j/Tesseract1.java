@@ -235,10 +235,7 @@ public class Tesseract1 extends TessAPI1 implements ITesseract {
                     result.insert(0, htmlBeginTag).append(htmlEndTag);
                 }
             } finally {
-                // delete temporary TIFF image for PDF
-                if (imageFile != null && imageFile.exists() && imageFile != inputFile && imageFile.getName().startsWith("multipage") && imageFile.getName().endsWith(ImageIOHelper.TIFF_EXT)) {
-                    imageFile.delete();
-                }
+
                 reader.dispose();
                 dispose();
             }
@@ -688,7 +685,6 @@ public class Tesseract1 extends TessAPI1 implements ITesseract {
      * @param formats types of renderer
      * @throws TesseractException
      */
-    @Override
     public void createDocuments(String filename, String outputbase, List<RenderedFormat> formats) throws TesseractException {
         createDocuments(new String[]{filename}, new String[]{outputbase}, formats);
     }
@@ -701,7 +697,6 @@ public class Tesseract1 extends TessAPI1 implements ITesseract {
      * @param formats types of renderer
      * @throws TesseractException
      */
-    @Override
     public void createDocuments(String[] filenames, String[] outputbases, List<RenderedFormat> formats) throws TesseractException {
         if (filenames.length != outputbases.length) {
             throw new RuntimeException("The two arrays must match in length.");
@@ -726,10 +721,6 @@ public class Tesseract1 extends TessAPI1 implements ITesseract {
                     // skip the problematic image file
                     logger.warn(e.getMessage(), e);
                 } finally {
-                    // delete temporary TIFF image for PDF
-                    if (imageFile != null && imageFile.exists() && imageFile != inputFile && imageFile.getName().startsWith("multipage") && imageFile.getName().endsWith(ImageIOHelper.TIFF_EXT)) {
-                        imageFile.delete();
-                    }
                 }
             }
         } finally {
@@ -901,143 +892,8 @@ public class Tesseract1 extends TessAPI1 implements ITesseract {
         return words;
     }
 
-    /**
-     * Creates documents with OCR result for given renderers at specified page
-     * iterator level.
-     *
-     * @param bi input buffered image
-     * @param filename filename (optional)
-     * @param outputbase output filenames without extension
-     * @param formats types of renderer
-     * @param pageIteratorLevel TessPageIteratorLevel enum
-     * @return OCR result
-     * @throws TesseractException
-     */
-    @Override
-    public OCRResult createDocumentsWithResults(BufferedImage bi, String filename, String outputbase, List<RenderedFormat> formats, int pageIteratorLevel) throws TesseractException {
-        List<OCRResult> results = createDocumentsWithResults(new BufferedImage[]{bi}, new String[]{filename}, new String[]{outputbase}, formats, pageIteratorLevel);
-        if (!results.isEmpty()) {
-            return results.get(0);
-        } else {
-            return null;
-        }
-    }
 
-    /**
-     * Creates documents with OCR results for given renderers at specified page
-     * iterator level.
-     *
-     * @param bis array of input buffered images
-     * @param filenames array of filenames
-     * @param outputbases array of output filenames without extension
-     * @param formats types of renderer
-     * @param pageIteratorLevel TessPageIteratorLevel enum
-     * @return list of OCR results
-     * @throws TesseractException
-     */
-    @Override
-    public List<OCRResult> createDocumentsWithResults(BufferedImage[] bis, String[] filenames, String[] outputbases, List<RenderedFormat> formats, int pageIteratorLevel) throws TesseractException {
-        if (bis.length != filenames.length || bis.length != outputbases.length) {
-            throw new RuntimeException("The three arrays must match in length.");
-        }
 
-        init();
-        setVariables();
-
-        List<OCRResult> results = new ArrayList<>();
-
-        try {
-            for (int i = 0; i < bis.length; i++) {
-                try {
-                    TessResultRenderer renderer = createRenderers(outputbases[i], formats);
-                    int meanTextConfidence = createDocuments(bis[i], filenames[i], renderer);
-                    TessDeleteResultRenderer(renderer);
-                    List<Word> words = meanTextConfidence > 0 ? getRecognizedWords(pageIteratorLevel) : new ArrayList<>();
-                    results.add(new OCRResult(meanTextConfidence, words));
-                } catch (Exception e) {
-                    // skip the problematic image file
-                    logger.warn(e.getMessage(), e);
-                }
-            }
-        } finally {
-            dispose();
-        }
-
-        return results;
-    }
-
-    /**
-     * Creates documents with OCR result for given renderers at specified page
-     * iterator level.
-     *
-     * @param filename input file
-     * @param outputbase output filenames without extension
-     * @param formats types of renderer
-     * @param pageIteratorLevel TessPageIteratorLevel enum
-     * @return OCR result
-     * @throws TesseractException
-     */
-    @Override
-    public OCRResult createDocumentsWithResults(String filename, String outputbase, List<RenderedFormat> formats, int pageIteratorLevel) throws TesseractException {
-        List<OCRResult> results = createDocumentsWithResults(new String[]{filename}, new String[]{outputbase}, formats, pageIteratorLevel);
-        if (!results.isEmpty()) {
-            return results.get(0);
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * Creates documents with OCR results for given renderers at specified page
-     * iterator level.
-     *
-     * @param filenames array of input files
-     * @param outputbases array of output filenames without extension
-     * @param formats types of renderer
-     * @return list of OCR results
-     * @throws TesseractException
-     */
-    @Override
-    public List<OCRResult> createDocumentsWithResults(String[] filenames, String[] outputbases, List<ITesseract.RenderedFormat> formats, int pageIteratorLevel) throws TesseractException {
-        if (filenames.length != outputbases.length) {
-            throw new RuntimeException("The two arrays must match in length.");
-        }
-
-        init();
-        setVariables();
-
-        List<OCRResult> results = new ArrayList<>();
-
-        try {
-            for (int i = 0; i < filenames.length; i++) {
-                File inputFile = new File(filenames[i]);
-                File imageFile = null;
-
-                try {
-                    // if PDF, convert to multi-page TIFF
-                    imageFile = ImageIOHelper.getImageFile(inputFile);
-
-                    TessResultRenderer renderer = createRenderers(outputbases[i], formats);
-                    int meanTextConfidence = createDocuments(imageFile.getPath(), renderer);
-                    TessDeleteResultRenderer(renderer);
-                    List<Word> words = meanTextConfidence > 0 ? getRecognizedWords(imageFile, pageIteratorLevel) : new ArrayList<>();
-                    results.add(new OCRResult(meanTextConfidence, words));
-                } catch (Exception e) {
-                    // skip the problematic image file
-                    logger.warn(e.getMessage(), e);
-                } finally {
-                    // delete temporary TIFF image for PDF
-                    if (imageFile != null && imageFile.exists() && imageFile != inputFile && imageFile.getName().startsWith("multipage") && imageFile.getName().endsWith(ImageIOHelper.TIFF_EXT)) {
-                        imageFile.delete();
-                    }
-                }
-            }
-        } finally {
-            dispose();
-        }
-
-        return results;
-    }
 
     /**
      * Gets result words at specified page iterator level from a recognized
@@ -1078,37 +934,6 @@ public class Tesseract1 extends TessAPI1 implements ITesseract {
             TessResultIteratorDelete(ri);
         } catch (Exception e) {
             logger.warn(e.getMessage(), e);
-        }
-
-        return words;
-    }
-
-    /**
-     * Gets result words at specified page iterator level from pages. For
-     * multi-page images, it reruns recognition, doubling processing time.
-     *
-     * @param inputFile input file
-     * @param pageIteratorLevel TessPageIteratorLevel enum
-     * @return list of <code>Word</code>
-     */
-    private List<Word> getRecognizedWords(File inputFile, int pageIteratorLevel) {
-        List<Word> words = new ArrayList<>();
-
-        try {
-            List<BufferedImage> biList = ImageIOHelper.getImageList(inputFile);
-
-            if (biList.isEmpty()) {
-                return words;
-            } else if (biList.size() == 1) {
-                return getRecognizedWords(pageIteratorLevel);
-            } else {
-                alreadyInvoked = true;
-                return getWords(biList, pageIteratorLevel);
-            }
-        } catch (IOException e) {
-            logger.warn(e.getMessage(), e);
-        } finally {
-            alreadyInvoked = false;
         }
 
         return words;

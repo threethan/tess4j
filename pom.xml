@@ -6,6 +6,7 @@
     <version>5.11.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
+
     <name>Tess4J - Tesseract for Java</name>
     <url>http://tess4j.sourceforge.net</url>
     <description>
@@ -76,6 +77,9 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
         <manifest.implementation.vendor>Tess4J</manifest.implementation.vendor>
         <manifest.url>http://tess4j.sourceforge.net/</manifest.url>
         <manifest.implementation.title>${project.groupId}:${project.artifactId}</manifest.implementation.title>
@@ -101,8 +105,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.12.1</version>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <source>11</source>
+                    <target>11</target>
                     <debug>false</debug>
                 </configuration>
             </plugin>
@@ -196,11 +200,6 @@
             <groupId>net.java.dev.jna</groupId>
             <artifactId>jna</artifactId>
             <version>5.14.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.github.jai-imageio</groupId>
-            <artifactId>jai-imageio-core</artifactId>
-            <version>1.4.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.pdfbox</groupId>

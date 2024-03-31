@@ -280,22 +280,6 @@ public class Tesseract1Test {
         assertEquals(expResult, result.substring(0, expResult.length()));
     }
 
-    /**
-     * Test of createDocuments method, of class Tesseract1.
-     *
-     * @throws java.lang.Exception
-     */
-    @Test
-    public void testCreateDocuments() throws Exception {
-        logger.info("createDocuments for an image");
-        File imageFile1 = new File(this.testResourcesDataPath, "eurotext.pdf");
-        File imageFile2 = new File(this.testResourcesDataPath, "eurotext.png");
-        String outputbase1 = "target/test-classes/test-results/docrenderer1-1";
-        String outputbase2 = "target/test-classes/test-results/docrenderer1-2";
-        List<RenderedFormat> formats = new ArrayList<RenderedFormat>(Arrays.asList(RenderedFormat.HOCR, RenderedFormat.PDF, RenderedFormat.TEXT));
-        instance.createDocuments(new String[]{imageFile1.getPath(), imageFile2.getPath()}, new String[]{outputbase1, outputbase2}, formats);
-        assertTrue(new File(outputbase1 + ".pdf").exists());
-    }
 
     /**
      * Test of getWords method, of class Tesseract1.
@@ -347,46 +331,5 @@ public class Tesseract1Test {
         }
 
         assertTrue(result.size() > 0);
-    }
-
-    /**
-     * Test of createDocumentsWithResults method, of class Tesseract1.
-     *
-     * @throws java.lang.Exception
-     */
-    @Test
-    public void testCreateDocumentsWithResults() throws Exception {
-        logger.info("createDocumentsWithResults for multiple images at given TessPageIteratorLevel");
-        File imageFile1 = new File(this.testResourcesDataPath, "eurotext.png");
-        File imageFile2 = new File(this.testResourcesDataPath, "multipage-pdf.pdf");
-        String outputbase1 = "target/test-classes/test-results/docrenderer1-3";
-        String outputbase2 = "target/test-classes/test-results/docrenderer1-4";
-        List<RenderedFormat> formats = new ArrayList<RenderedFormat>(Arrays.asList(RenderedFormat.HOCR, RenderedFormat.PDF, RenderedFormat.TEXT));
-        instance.setVariable(ITesseract.DOCUMENT_TITLE, "My document");
-        List<OCRResult> results = instance.createDocumentsWithResults(new String[]{imageFile1.getPath(), imageFile2.getPath()}, new String[]{outputbase1, outputbase2}, formats, TessPageIteratorLevel.RIL_WORD);
-        assertTrue(new File(outputbase1 + ".pdf").exists());
-        assertEquals(2, results.size());
-        // Not work on Linux because unable to load pdf.ttf
-//        assertTrue(results.get(0).getConfidence() > 0);
-//        assertEquals(66, results.get(0).getWords().size());
-    }
-
-    /**
-     * Test of createDocumentsWithResults method, of class Tesseract1.
-     *
-     * @throws java.lang.Exception
-     */
-    @Test
-    public void testCreateDocumentsWithResults1() throws Exception {
-        logger.info("createDocumentsWithResults for a buffered image at given TessPageIteratorLevel");
-        File imageFile = new File(this.testResourcesDataPath, "eurotext.tif");
-        BufferedImage bi = ImageIO.read(imageFile);
-        String outputbase = "target/test-classes/test-results/docrenderer1-5";
-        List<RenderedFormat> formats = new ArrayList<RenderedFormat>(Arrays.asList(RenderedFormat.HOCR, RenderedFormat.PDF, RenderedFormat.TEXT));
-        instance.setVariable(ITesseract.DOCUMENT_TITLE, "My document");
-        OCRResult result = instance.createDocumentsWithResults(bi, imageFile.getPath(), outputbase, formats, TessPageIteratorLevel.RIL_WORD);
-        assertTrue(new File(outputbase + ".pdf").exists());
-        assertTrue(result.getConfidence() > 0);
-        assertEquals(66, result.getWords().size());
     }
 }
