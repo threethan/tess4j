@@ -1,3 +1,6 @@
+> [!CAUTION]
+> This fork, alongside the use of moditect for depedences, makes Tess4J compatible with jPackage. However, it strips out a lot of functionality, and breaks things!
+
 ## Tess4J
 
 [![Join the chat at https://gitter.im/nguyenq/tess4j](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/nguyenq/tess4j?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
